@@ -1,0 +1,484 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>HK Room Checklist</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.19.0/tabler-icons.min.css">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#fff;--bg2:#f5f5f3;--bg3:#ebebea;
+  --border:#e3e3e0;--border2:#d0d0cc;
+  --text:#1a1a18;--text2:#6b6b67;--text3:#9a9a96;
+  --green:#0F6E56;--green-bg:#EAF3DE;--green-border:#C0DD97;
+  --red:#A32D2D;--red-bg:#FAECE7;--red-border:#F5C4B3;
+  --amber:#854F0B;--amber-bg:#FAEEDA;--amber-border:#FAC775;
+  --accent:#1D9E75;
+  --r-sm:6px;--r-md:10px;--r-lg:14px;
+}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:var(--bg2);color:var(--text)}
+.app{max-width:430px;margin:0 auto;min-height:100vh}
+.topbar{background:var(--bg);border-bottom:.5px solid var(--border);padding:12px 16px;display:flex;align-items:center;gap:10px;position:sticky;top:0;z-index:20}
+.topbar-title{font-size:15px;font-weight:500;flex:1}
+.back-btn{background:none;border:none;cursor:pointer;color:var(--text2);font-size:20px;padding:4px;display:flex;align-items:center}
+.page{display:none}.page.active{display:block}
+.tab-bar{display:flex;background:var(--bg3);border-radius:var(--r-md);padding:3px;margin:12px 16px 0;gap:3px}
+.tab-btn{flex:1;padding:7px 2px;border:none;background:none;border-radius:var(--r-sm);font-size:11px;cursor:pointer;color:var(--text2);white-space:nowrap}
+.tab-btn.active{background:var(--bg);color:var(--text);font-weight:500;border:.5px solid var(--border)}
+.pad{padding:12px 16px 80px}
+.stat-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin-bottom:12px}
+.stat-card{background:var(--bg);border-radius:var(--r-md);padding:12px;border:.5px solid var(--border)}
+.stat-label{font-size:11px;color:var(--text2);margin-bottom:4px}
+.stat-num{font-size:20px;font-weight:500}
+.stat-num.g{color:var(--green)}.stat-num.r{color:var(--red)}.stat-num.a{color:var(--amber)}
+.prog-wrap{background:var(--bg);border:.5px solid var(--border);border-radius:var(--r-lg);padding:13px 16px;margin-bottom:12px}
+.prog-label{font-size:13px;color:var(--text2);margin-bottom:8px}
+.prog-bg{background:var(--bg3);border-radius:20px;height:9px;overflow:hidden}
+.prog-fill{background:var(--accent);height:9px;border-radius:20px;transition:width .4s}
+.legend{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:10px}
+.legend-item{display:flex;align-items:center;gap:5px;font-size:11px;color:var(--text2)}
+.ldot{width:9px;height:9px;border-radius:3px}
+.group-label{font-size:11px;color:var(--text2);font-weight:500;margin:12px 0 5px;padding:0 2px}
+.room-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:5px;margin-bottom:4px}
+.rdot{aspect-ratio:1;border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:500;cursor:pointer;border:.5px solid transparent;transition:transform .1s;line-height:1;text-align:center;padding:2px}
+.rdot:active{transform:scale(.9)}
+.rdot.done{background:var(--green-bg);color:var(--green);border-color:var(--green-border)}
+.rdot.issue{background:var(--red-bg);color:var(--red);border-color:var(--red-border)}
+.rdot.pending{background:var(--bg3);color:var(--text2);border-color:var(--border)}
+.card{background:var(--bg);border:.5px solid var(--border);border-radius:var(--r-lg);padding:12px 14px;margin-bottom:8px;cursor:pointer}
+.card:active{background:var(--bg2)}
+.card-hd{display:flex;align-items:center;justify-content:space-between;margin-bottom:3px}
+.card-title{font-size:14px;font-weight:500}
+.card-sub{font-size:12px;color:var(--text2)}
+.badge{font-size:11px;padding:3px 8px;border-radius:var(--r-md)}
+.bd{background:var(--green-bg);color:var(--green)}
+.bi{background:var(--red-bg);color:var(--red)}
+.bp{background:var(--bg3);color:var(--text2)}
+.search-wrap{position:relative;margin-bottom:9px}
+.search-wrap i{position:absolute;left:10px;top:50%;transform:translateY(-50%);color:var(--text2);font-size:15px}
+.search-input{width:100%;padding:8px 12px 8px 32px;border-radius:var(--r-md);border:.5px solid var(--border2);background:var(--bg);color:var(--text);font-size:14px}
+.filter-row{display:flex;gap:5px;margin-bottom:10px;flex-wrap:wrap}
+.fchip{padding:5px 10px;border-radius:20px;border:.5px solid var(--border);background:none;font-size:11px;cursor:pointer;color:var(--text2)}
+.fchip.active{background:var(--bg3);color:var(--text);border-color:var(--border2)}
+.cl-sec{background:var(--bg);border:.5px solid var(--border);border-radius:var(--r-lg);margin-bottom:10px;overflow:hidden}
+.cl-sec-hd{padding:10px 16px;font-size:13px;font-weight:500;background:var(--bg2);border-bottom:.5px solid var(--border)}
+.cl-item{display:flex;align-items:center;gap:8px;padding:9px 16px;border-bottom:.5px solid var(--border)}
+.cl-item:last-child{border-bottom:none}
+.cl-item label{flex:1;font-size:12px;line-height:1.4}
+.cbtn{padding:4px 8px;font-size:11px;border-radius:5px;border:.5px solid var(--border);background:none;cursor:pointer;color:var(--text2);white-space:nowrap}
+.cbtn.ok{background:var(--green-bg);color:var(--green);border-color:var(--green-border)}
+.cbtn.fail{background:var(--red-bg);color:var(--red);border-color:var(--red-border)}
+.issue-area{padding:8px 16px 11px;background:var(--bg);border-bottom:.5px solid var(--border)}
+.issue-input{width:100%;padding:6px 10px;font-size:12px;border-radius:var(--r-sm);border:.5px solid var(--border2);background:var(--bg2);color:var(--text);resize:none;margin-bottom:7px}
+.photos-label{font-size:11px;color:var(--text2);margin-bottom:5px}
+.photo-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:5px}
+.photo-slot{aspect-ratio:1;border-radius:7px;border:1px dashed var(--border2);display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--text2);font-size:18px;background:var(--bg2);position:relative;overflow:hidden}
+.photo-slot img{width:100%;height:100%;object-fit:cover;position:absolute;inset:0;border-radius:7px}
+.photo-del{position:absolute;top:2px;right:2px;background:rgba(0,0,0,.5);color:#fff;border:none;border-radius:50%;width:17px;height:17px;font-size:10px;cursor:pointer;display:none;align-items:center;justify-content:center;z-index:2}
+.photo-slot:hover .photo-del,.photo-slot:active .photo-del{display:flex}
+.save-btn{width:100%;padding:13px;background:var(--accent);color:#fff;border:none;border-radius:var(--r-md);font-size:14px;font-weight:500;cursor:pointer;margin-top:14px;display:flex;align-items:center;justify-content:center;gap:7px}
+.save-btn:active{background:var(--green)}
+.job-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin-bottom:12px}
+.job-chip{padding:10px 12px;border-radius:var(--r-md);border:.5px solid var(--border);background:var(--bg);cursor:pointer}
+.job-chip:active{background:var(--bg2)}
+.job-chip-name{font-size:13px;font-weight:500}
+.job-chip-count{font-size:11px;color:var(--text2);margin-top:2px}
+.tech-card{background:var(--bg);border:.5px solid var(--border);border-radius:var(--r-lg);margin-bottom:9px;overflow:hidden}
+.tech-hd{padding:11px 16px;display:flex;align-items:center;justify-content:space-between;border-bottom:.5px solid var(--border);gap:8px;flex-wrap:wrap}
+.tech-job-item{padding:10px 16px;border-bottom:.5px solid var(--border)}
+.tech-job-item:last-child{border-bottom:none}
+.tech-job-name{font-size:12px;margin-bottom:3px}
+.tech-job-note{font-size:11px;color:var(--text2);margin-bottom:6px}
+.tech-photos{display:flex;gap:5px;flex-wrap:wrap;margin-bottom:6px}
+.tech-photo{width:58px;height:58px;border-radius:6px;object-fit:cover;border:.5px solid var(--border);cursor:pointer}
+.tech-status-row{display:flex;gap:5px}
+.tsbtn{padding:4px 10px;font-size:11px;border-radius:5px;border:.5px solid var(--border);background:none;cursor:pointer;color:var(--text2)}
+.tsbtn.wait{background:var(--amber-bg);color:var(--amber);border-color:var(--amber-border)}
+.tsbtn.done{background:var(--green-bg);color:var(--green);border-color:var(--green-border)}
+.edit-notice{background:#E1F5EE;border:.5px solid #9FE1CB;border-radius:var(--r-md);padding:9px 13px;font-size:12px;color:#085041;margin-bottom:12px}
+.edit-sec-wrap{background:var(--bg);border:.5px solid var(--border);border-radius:var(--r-lg);margin-bottom:11px;overflow:hidden}
+.edit-sec-hd{padding:9px 13px;background:var(--bg2);border-bottom:.5px solid var(--border);display:flex;align-items:center;gap:7px}
+.esec-drag{color:var(--text2);font-size:17px;cursor:grab;flex-shrink:0;touch-action:none}
+.esec-input{flex:1;font-size:13px;font-weight:500;padding:4px 8px;border-radius:5px;border:.5px solid var(--border2);background:var(--bg);color:var(--text)}
+.icon-btn{background:none;border:none;cursor:pointer;padding:4px;color:var(--text2);font-size:15px;display:flex;align-items:center;border-radius:5px;flex-shrink:0}
+.icon-btn.danger:active{background:var(--red-bg);color:var(--red)}
+.edit-item-row{display:flex;align-items:center;gap:7px;padding:8px 13px;border-bottom:.5px solid var(--border);background:var(--bg);touch-action:none;user-select:none}
+.edit-item-row:last-child{border-bottom:none}
+.edit-item-row input{flex:1;font-size:12px;padding:5px 9px;border-radius:5px;border:.5px solid var(--border2);background:var(--bg2);color:var(--text)}
+.eitem-drag{color:var(--text2);font-size:16px;cursor:grab;flex-shrink:0;touch-action:none}
+.edit-item-row.dragging{opacity:.35}
+.edit-item-row.drag-over{border-top:2px solid var(--accent)}
+.edit-sec-wrap.sec-dragging{opacity:.35}
+.edit-sec-wrap.sec-drag-over{border-top:2px solid var(--accent)}
+.add-item-row{padding:8px 13px;display:flex;gap:7px}
+.add-item-input{flex:1;font-size:12px;padding:6px 9px;border-radius:5px;border:.5px solid var(--border2);background:var(--bg2);color:var(--text)}
+.add-item-btn{padding:6px 11px;font-size:12px;border-radius:5px;border:.5px solid var(--border2);background:none;cursor:pointer;color:var(--text);white-space:nowrap}
+.add-sec-btn{width:100%;padding:11px;border:1px dashed var(--border2);border-radius:var(--r-lg);background:none;cursor:pointer;color:var(--text2);font-size:12px;display:flex;align-items:center;justify-content:center;gap:6px;margin-bottom:12px}
+.exp-card{background:var(--bg);border:.5px solid var(--border);border-radius:var(--r-lg);padding:14px 16px;margin-bottom:9px}
+.exp-title{font-size:14px;font-weight:500;margin-bottom:3px}
+.exp-sub{font-size:12px;color:var(--text2);margin-bottom:10px}
+.exp-btn{width:100%;padding:9px;border:.5px solid var(--border2);border-radius:var(--r-md);background:none;font-size:13px;cursor:pointer;color:var(--text);display:flex;align-items:center;justify-content:center;gap:6px}
+.toast{position:fixed;bottom:26px;left:50%;transform:translateX(-50%);background:#2C2C2A;color:#fff;padding:9px 18px;border-radius:18px;font-size:13px;opacity:0;transition:opacity .3s;pointer-events:none;z-index:99;white-space:nowrap}
+.toast.show{opacity:1}
+.lightbox{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,.9);z-index:100;display:none;align-items:center;justify-content:center}
+.lightbox.show{display:flex}
+.lightbox img{max-width:95%;max-height:90%;border-radius:8px}
+.lb-close{position:absolute;top:14px;right:14px;background:rgba(255,255,255,.15);border:none;color:#fff;font-size:20px;width:34px;height:34px;border-radius:50%;cursor:pointer;display:flex;align-items:center;justify-content:center}
+</style>
+</head>
+<body>
+<div class="app">
+<div class="topbar">
+  <button class="back-btn" id="back-btn" style="display:none" onclick="goBack()"><i class="ti ti-arrow-left"></i></button>
+  <span class="topbar-title" id="topbar-title">🏨 HK Room Checklist</span>
+</div>
+
+<div id="page-home" class="page active">
+  <div class="tab-bar">
+    <button class="tab-btn active" onclick="switchTab('overview',this)">ภาพรวม</button>
+    <button class="tab-btn" onclick="switchTab('rooms',this)">ห้อง</button>
+    <button class="tab-btn" onclick="switchTab('tech',this)">🔧 ช่าง</button>
+    <button class="tab-btn" onclick="switchTab('edit',this)">✏️ แก้ไข</button>
+    <button class="tab-btn" onclick="switchTab('export',this)">ส่งออก</button>
+  </div>
+  <div class="pad">
+    <div id="tab-overview">
+      <div class="stat-grid" style="margin-top:4px">
+        <div class="stat-card"><div class="stat-label">ห้องทั้งหมด</div><div class="stat-num" id="s-total">101</div></div>
+        <div class="stat-card"><div class="stat-label">เสร็จแล้ว</div><div class="stat-num g" id="s-done">0</div></div>
+        <div class="stat-card"><div class="stat-label">มีปัญหา</div><div class="stat-num r" id="s-issue">0</div></div>
+        <div class="stat-card"><div class="stat-label">รอตรวจ</div><div class="stat-num a" id="s-pend">101</div></div>
+      </div>
+      <div class="prog-wrap">
+        <div class="prog-label">ความคืบหน้า <span id="prog-pct" style="font-weight:500">0%</span></div>
+        <div class="prog-bg"><div class="prog-fill" id="prog-bar" style="width:0%"></div></div>
+      </div>
+      <div class="legend">
+        <div class="legend-item"><div class="ldot" style="background:#C0DD97"></div>เสร็จ</div>
+        <div class="legend-item"><div class="ldot" style="background:#F5C4B3"></div>มีปัญหา</div>
+        <div class="legend-item"><div class="ldot" style="background:#ebebea"></div>รอตรวจ</div>
+      </div>
+      <div id="ov-grid"></div>
+    </div>
+    <div id="tab-rooms" style="display:none">
+      <div class="search-wrap"><i class="ti ti-search"></i><input class="search-input" type="text" placeholder="ค้นหาห้อง เช่น 8611..." oninput="filterRooms(this.value)"></div>
+      <div class="filter-row">
+        <button class="fchip active" onclick="setFilter('all',this)">ทั้งหมด</button>
+        <button class="fchip" onclick="setFilter('pending',this)">รอตรวจ</button>
+        <button class="fchip" onclick="setFilter('done',this)">เสร็จ</button>
+        <button class="fchip" onclick="setFilter('issue',this)">มีปัญหา</button>
+        <button class="fchip" onclick="setFilter('Building A',this)">Bldg A</button>
+        <button class="fchip" onclick="setFilter('Building B',this)">Bldg B</button>
+        <button class="fchip" onclick="setFilter('Building C',this)">Bldg C</button>
+        <button class="fchip" onclick="setFilter('Building D',this)">Bldg D</button>
+        <button class="fchip" onclick="setFilter('Villa',this)">Villa</button>
+      </div>
+      <div id="room-list"></div>
+    </div>
+    <div id="tab-tech" style="display:none">
+      <div id="tech-select">
+        <div style="font-size:13px;color:var(--text2);margin-bottom:10px">เลือกประเภทงานที่จะทำวันนี้</div>
+        <div class="job-grid" id="job-grid"></div>
+      </div>
+      <div id="tech-result" style="display:none">
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:11px">
+          <button style="background:none;border:.5px solid var(--border);border-radius:20px;padding:5px 11px;font-size:12px;cursor:pointer;color:var(--text2)" onclick="showTechSelect()">← เปลี่ยน</button>
+          <span id="tech-job-title" style="font-size:14px;font-weight:500"></span>
+        </div>
+        <div id="tech-rooms"></div>
+      </div>
+    </div>
+    <div id="tab-edit" style="display:none">
+      <div class="edit-notice"><i class="ti ti-info-circle" style="margin-right:5px"></i>จับ ≡ ลากเพื่อเรียง — ได้ทั้งรายการและหมวด</div>
+      <div id="edit-body"></div>
+      <button class="add-sec-btn" onclick="addSection()"><i class="ti ti-plus"></i> เพิ่มหมวดหมู่ใหม่</button>
+    </div>
+    <div id="tab-export" style="display:none">
+      <div class="exp-card"><div class="exp-title">สรุปภาพรวม</div><div class="exp-sub">สถานะห้องทั้งหมดพร้อมรายการปัญหา</div><button class="exp-btn" onclick="exportSummary()"><i class="ti ti-copy"></i> คัดลอก</button></div>
+      <div class="exp-card"><div class="exp-title">รายการแจ้งช่าง</div><div class="exp-sub">จัดกลุ่มตามประเภทงาน</div><button class="exp-btn" onclick="exportRepair()"><i class="ti ti-copy"></i> คัดลอก</button></div>
+    </div>
+  </div>
+</div>
+
+<div id="page-room" class="page">
+  <div id="cl-body"></div>
+  <div style="padding:0 16px 80px"><button class="save-btn" onclick="saveRoom()"><i class="ti ti-device-floppy"></i> บันทึกผล</button></div>
+</div>
+
+<div id="lightbox" class="lightbox" onclick="closeLightbox()">
+  <button class="lb-close" onclick="closeLightbox()"><i class="ti ti-x"></i></button>
+  <img id="lb-img" src="" alt="">
+</div>
+<div class="toast" id="toast"></div>
+
+<script>
+const ROOM_DATA=[
+  {type:'Building A',rooms:[8611,8612,8613,8614,8615,8616,8617,8621,8622,8623,8624,8625,8626,8627,8631,8632,8633,8634,8635,8636,8637]},
+  {type:'Building B',rooms:[8711,8712,8713,8714,8715,8716,8717,8721,8722,8723,8724,8725,8726,8727,8731,8732,8733,8734,8735,8736,8737]},
+  {type:'Building C',rooms:[8811,8812,8813,8814,8815,8816,8817,8821,8822,8823,8824,8825,8826,8827,8831,8832,8833,8834,8835,8836,8837]},
+  {type:'Building D',rooms:[8911,8912,8913,8914,8915,8921,8922,8923,8924,8931,8932,8933]},
+  {type:'Villa A',rooms:[8861,8862,8863,8864,8865,8866,8867,8868,8881,8882,8883,8884]},
+  {type:'Villa B',rooms:[8871,8872,8873,8874,8875,8876,8877,8878,8879,8880,8885,8886,8887,8888]},
+];
+const ALL_ROOMS=[];
+ROOM_DATA.forEach(g=>g.rooms.forEach(r=>ALL_ROOMS.push({id:r,name:''+r,type:g.type})));
+
+let CHECKLIST=[
+  {sec:'1. ประตูทางเข้า',items:['กริ่งประตู - ระดับเสียง','กริ่งประตู - ไฟ Do not','กริ่งประตู - ไฟ Make up','กริ่งประตู - สี','ป้ายเบอร์ห้อง - หลวม/เอียง','ป้ายเบอร์ห้อง - สี','ป้ายเบอร์ห้อง - ที่เสียบนากทำความสะอาด','วงกบประตู - สีลอก','วงกบประตู - ยาแนว/ซิลิโคน','วงกบประตู - ขอบยางกันกระแทก','วงกบประตู - ทรายล้างธรณีประตูไม่เต็ม','วงกบประตู - โซ่+ตับเบิ้ลล็อค','วงกบประตู - ตัวดักแมลงตรงประตู','วงกบประตู - กันชนประตู','วงกบประตู - สนิม','มือจับประตู - หลวม','ป้าย Non Smoking - หลุด/ชำรุด','เส้นทางหนีไฟ - หลุด/ชำรุด','ฟิลเตอร์แอร์ - สีแตกร้าว','ตาแมว - ขี้เกลือ','ตาแมว - กระจกมอง','สวิตซ์ไฟ - ระบบไฟ','สวิตซ์ไฟ - ติดสลับ']},
+  {sec:'2. ตู้เสื้อผ้า',items:['ชั้นวางของข้างตู้ - ยาแนว','ชั้นวางของข้างตู้ - ไฟ','ประตูตู้ด้านใน - บานพับหลุด/หลวม','ประตูตู้ด้านใน - ฝาปิดน็อตบานพับ','ประตูตู้ด้านใน - บิ่น','ประตูตู้ด้านใน - ไม่ปิดรูน็อต','ประตูตู้ด้านนอก - มือจับประตู','ประตูตู้ด้านนอก - แผงไม้ลายจำปูน','ระบบไฟ - ไม่ตัด/ไม่ทำงาน/ไม่สว่าง','ลิ้นชัก - ฝืด','ราวสแตนเลสแขวนผ้า - หลุด/หลวม','ราวสแตนเลสแขวนผ้า - สนิม','ชั้นวางด้านในตู้ - ยาแนว','ชั้นวางด้านในตู้ - ปิดรูน็อต','ม้าวางกระเป๋า - ยาแนว','ลิ้นชักม้าวางกระเป๋า - ฝืด','ลิ้นชักม้าวางกระเป๋า - รางเลื่อน','ลิ้นชักใส่แก้ว - ฝืด','ลิ้นชักใส่แก้ว - รางเลื่อน','ชั้นวางชุดชากาแฟ']},
+  {sec:'3. โต๊ะเครื่องแป้ง',items:['ผนังกั้น - ยาแนว','ผนังกั้น - แผงลายจำปูนบิ่น/สีลอก','ผนังกั้น - กระจกมีรอยขีด','พื้นปาเก้ - ยุบ/บวม','พื้นปาเก้ - ยาแนวไม่เต็ม','คิ้วบัวรอบห้อง - ยาแนว','ปลั๊กไฟ - ติดสลับไม่ตรงรูป','ปลั๊กไฟ - หลุด','บลูทูธ - ยาแนว','โคมไฟ - สีลอก','โคมไฟ - ขาหลวม','ผนังข้างโต๊ะมินิบาร์ - แตกร้าว']},
+  {sec:'4. โซฟา',items:['โซฟาและพนักพิง - สีลอก','โซฟาและพนักพิง - น็อตหลุด','โต๊ะหน้าโซฟา - สีลอก','ผนังข้างโซฟา - แตกร้าว','TV - เสาทีวีติดสี','TV - มีรูเพดานตรงเสาทีวี','พัดลมเพดาน - ฝาครอบหลุด/หลวม']},
+  {sec:'5. ห้องนอน',items:['เตียงนอน - สีลอก','เตียงนอน - ล้อเตียง','เตียงนอน - ไม้รองขาเตียง','โต๊ะหัวเตียง - สีลอก','โต๊ะหัวเตียง - ยาแนว','โคมไฟหัวเตียง - สีลอก','โคมไฟหัวเตียง - จุกโคมหลุด/หาย','ระบบไฟ - ไฟส่องหนังสือ','ระบบไฟ - เมนท์สวิตซ์','ระบบไฟ - ปลั๊ก USB','ขอบกระจกหัวเตียง - สีลอก','แผงลายฉลุดอกจำปูนหัวเตียง - สีลอก','ฝ้าเพดาน - สีลอก','ผนังห้อง - สีลอก/บิ่น','ผนังหน้ากากแอร์ - บวม/แตกร้าว','ระบบแอร์ - ไม่ได้หุ้มฟอยท์','ระบบแอร์ - ปุ่มกด','ตัวดักควัน - ไฟกระพริบเตือน','ตัวดักควัน - ฝาครอบ']},
+  {sec:'6. หลังระเบียง',items:['ฝ้าเพดาน - คิ้วไม้หลุด/บวม','ฝ้าเพดาน - น้ำรั่ว/ซึม','ฝ้าเพดาน - ฝ้าเชิงชายหลุด','ระบบไฟระเบียง','เสาซังเก้น - สีลอก','เสาซังเก้น - ฐานปูนแตกร้าว','เหล็ก/ไม้ตรงเสาซังเก้น - สีลอก','ผนังไม้ระแนง - เด้ง/บวม','ผนังหลังระเบียง - แตกร้าว','กระจกกั้นซังเก้น - สนิมตัวล็อค']},
+];
+
+const JOB_TYPES=[
+  {id:'grout',name:'ยาแนว/ซิลิโคน',icon:'ti-tool',kw:['ยาแนว','ซิลิโคน']},
+  {id:'paint',name:'สีลอก/แตกร้าว',icon:'ti-paint',kw:['สีลอก','แตกร้าว','สีแตก','บวม']},
+  {id:'electric',name:'ระบบไฟ/ปลั๊ก',icon:'ti-bolt',kw:['ไฟ','ปลั๊ก','บลูทูธ','สวิตซ์','USB']},
+  {id:'hinge',name:'บานพับ/มือจับ',icon:'ti-adjustments',kw:['บานพับ','มือจับ','น็อต','หลุด','หลวม','ล็อค']},
+  {id:'sanitary',name:'สุขภัณฑ์/น้ำ',icon:'ti-droplet',kw:['อ่าง','ฝักบัว','โถ','น้ำ','สนิม']},
+  {id:'structure',name:'ผนัง/เพดาน',icon:'ti-building',kw:['ผนัง','เพดาน','ฝ้า','รั่ว','ซึม','แตกร้าว']},
+  {id:'other',name:'งานอื่นๆ',icon:'ti-settings',kw:[]},
+];
+
+let roomData={};
+let currentRoom=null,currentFilter='all',currentSearch='';
+ALL_ROOMS.forEach(r=>{roomData[r.id]={status:'pending',checks:{},notes:{},photos:{},repairStatus:{}}});
+
+function toast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2000)}
+
+function renderOverview(){
+  const g=document.getElementById('ov-grid');g.innerHTML='';
+  ROOM_DATA.forEach(group=>{
+    const label=document.createElement('div');label.className='group-label';label.textContent=group.type;g.appendChild(label);
+    const grid=document.createElement('div');grid.className='room-grid';
+    group.rooms.forEach(rn=>{
+      const d=document.createElement('div');d.className='rdot '+roomData[rn].status;
+      d.textContent=rn;d.onclick=()=>openRoom(rn);grid.appendChild(d);
+    });
+    g.appendChild(grid);
+  });
+}
+
+function renderRoomList(){
+  const list=document.getElementById('room-list');
+  const isStatus=['all','pending','done','issue'].includes(currentFilter);
+  const rooms=ALL_ROOMS.filter(r=>{
+    if(isStatus){if(currentFilter!=='all'&&roomData[r.id].status!==currentFilter) return false;}
+    else{if(!r.type.toLowerCase().includes(currentFilter.toLowerCase())) return false;}
+    if(currentSearch&&!String(r.id).includes(currentSearch)) return false;
+    return true;
+  });
+  list.innerHTML='';
+  if(!rooms.length){list.innerHTML='<div style="text-align:center;padding:32px 0;color:var(--text2);font-size:13px">ไม่พบห้อง</div>';return;}
+  let lastType='';
+  rooms.forEach(r=>{
+    if(isStatus&&r.type!==lastType){const gl=document.createElement('div');gl.className='group-label';gl.textContent=r.type;list.appendChild(gl);lastType=r.type;}
+    const s=roomData[r.id].status;
+    const bc={done:'bd',issue:'bi',pending:'bp'}[s]||'bp';
+    const bt={done:'เสร็จแล้ว',issue:'มีปัญหา',pending:'รอตรวจ'}[s];
+    const ic=Object.values(roomData[r.id].checks).filter(v=>v==='fail').length;
+    const d=document.createElement('div');d.className='card';
+    d.innerHTML=`<div class="card-hd"><span class="card-title">ห้อง ${r.name} <span style="font-size:11px;color:var(--text2);font-weight:400">${r.type}</span></span><span class="badge ${bc}">${bt}</span></div><div class="card-sub">${ic?ic+' รายการมีปัญหา':'ยังไม่มีข้อมูล'}</div>`;
+    d.onclick=()=>openRoom(r.id);list.appendChild(d);
+  });
+}
+
+function matchJob(key,jobId){
+  if(jobId==='other') return true;
+  const jt=JOB_TYPES.find(j=>j.id===jobId);
+  return jt?jt.kw.some(k=>key.toLowerCase().includes(k.toLowerCase())):false;
+}
+function renderJobGrid(){
+  const g=document.getElementById('job-grid');g.innerHTML='';
+  JOB_TYPES.forEach(jt=>{
+    let cnt=0;ALL_ROOMS.forEach(r=>{if(Object.entries(roomData[r.id].checks).some(([k,v])=>v==='fail'&&matchJob(k,jt.id))) cnt++;});
+    const c=document.createElement('div');c.className='job-chip';
+    c.innerHTML=`<div class="job-chip-name"><i class="ti ${jt.icon}" style="margin-right:5px"></i>${jt.name}</div><div class="job-chip-count">${cnt} ห้อง</div>`;
+    c.onclick=()=>showTechResult(jt);g.appendChild(c);
+  });
+}
+function showTechSelect(){document.getElementById('tech-select').style.display='block';document.getElementById('tech-result').style.display='none';renderJobGrid()}
+function showTechResult(jt){
+  document.getElementById('tech-select').style.display='none';document.getElementById('tech-result').style.display='block';
+  document.getElementById('tech-job-title').textContent=jt.name;
+  const container=document.getElementById('tech-rooms');container.innerHTML='';let found=0;
+  ALL_ROOMS.forEach(r=>{
+    const d=roomData[r.id];const keys=Object.entries(d.checks).filter(([k,v])=>v==='fail'&&matchJob(k,jt.id)).map(([k])=>k);
+    if(!keys.length) return;found++;
+    const card=document.createElement('div');card.className='tech-card';
+    let html=keys.map(key=>{
+      const label=key.split('__')[1]||key;const note=d.notes[key]||'';const photos=d.photos[key]||[];const rs=d.repairStatus[key]||'none';
+      const ph=photos.map((p,pi)=>`<img class="tech-photo" src="${p}" onclick="openLightbox('${p}')" alt="${pi+1}">`).join('');
+      return `<div class="tech-job-item"><div class="tech-job-name">${label}</div>${note?`<div class="tech-job-note">${note}</div>`:''}${ph?`<div class="tech-photos">${ph}</div>`:''}
+      <div class="tech-status-row">
+        <button class="tsbtn ${rs==='wait'?'wait':''}" onclick="setRS(${r.id},'${key}','wait',this)"><i class="ti ti-clock"></i> รอช่าง</button>
+        <button class="tsbtn ${rs==='done'?'done':''}" onclick="setRS(${r.id},'${key}','done',this)"><i class="ti ti-check"></i> แก้ไขแล้ว</button>
+      </div></div>`;
+    }).join('');
+    const ri=ALL_ROOMS.find(x=>x.id===r.id);
+    card.innerHTML=`<div class="tech-hd"><span style="font-size:14px;font-weight:500">ห้อง ${r.id}</span><span style="font-size:11px;color:var(--text2)">${ri?ri.type:''}</span><span class="badge bi">${keys.length} จุด</span></div>${html}`;
+    container.appendChild(card);
+  });
+  if(!found) container.innerHTML='<div style="text-align:center;padding:32px 0;color:var(--text2);font-size:13px">ไม่พบห้องที่ต้องดำเนินการ</div>';
+}
+function setRS(roomId,key,status,btn){
+  roomData[roomId].repairStatus[key]=status;
+  btn.closest('.tech-status-row').querySelectorAll('.tsbtn').forEach(b=>b.classList.remove('wait','done'));
+  btn.classList.add(status);toast(status==='done'?'✓ แก้ไขแล้ว':'⏳ รอช่าง');
+}
+
+function openRoom(id){
+  currentRoom=id;document.getElementById('topbar-title').textContent='ห้อง '+id;
+  document.getElementById('back-btn').style.display='flex';
+  document.getElementById('page-home').classList.remove('active');document.getElementById('page-room').classList.add('active');
+  renderChecklist();
+}
+function renderChecklist(){
+  const body=document.getElementById('cl-body');body.innerHTML='';const d=roomData[currentRoom];
+  CHECKLIST.forEach(section=>{
+    const sec=document.createElement('div');sec.className='cl-sec';sec.innerHTML=`<div class="cl-sec-hd">${section.sec}</div>`;
+    section.items.forEach(item=>{
+      const key=section.sec+'__'+item;const val=d.checks[key]||'none';
+      const row=document.createElement('div');
+      row.innerHTML=`<div class="cl-item" data-key="${key}"><label>${item}</label>
+        <div style="display:flex;gap:4px">
+          <button class="cbtn ${val==='ok'?'ok':''}" onclick="setCheck('${key}','ok',this)">✓</button>
+          <button class="cbtn ${val==='fail'?'fail':''}" onclick="setCheck('${key}','fail',this)">✗</button>
+        </div></div>`;
+      sec.appendChild(row);
+      if(val==='fail') sec.appendChild(makeIssueArea(key,d.notes[key]||'',d.photos[key]||[]));
+    });
+    body.appendChild(sec);
+  });
+}
+function makeIssueArea(key,note,photos){
+  const sk=key.replace(/[^a-z0-9]/gi,'_');const div=document.createElement('div');div.className='issue-area';div.dataset.issueFor=key;
+  div.innerHTML=`<textarea class="issue-input" rows="2" placeholder="รายละเอียดปัญหา..." onchange="setNote('${key}',this.value)">${note}</textarea>
+  <div class="photos-label">รูปภาพ (สูงสุด 4 รูป)</div><div class="photo-grid" id="pg-${sk}">${renderPhotoSlots(key,photos)}</div>`;
+  return div;
+}
+function renderPhotoSlots(key,photos){
+  let h='';
+  for(let i=0;i<4;i++){
+    if(i<photos.length) h+=`<div class="photo-slot"><img src="${photos[i]}" onclick="openLightbox('${photos[i]}')" alt="${i+1}"><button class="photo-del" onclick="delPhoto('${key}',${i},event)">×</button></div>`;
+    else if(i===photos.length&&photos.length<4) h+=`<div class="photo-slot" onclick="addPhoto('${key}')"><i class="ti ti-camera-plus"></i></div>`;
+    else h+=`<div class="photo-slot" style="opacity:.15;cursor:default"><i class="ti ti-photo"></i></div>`;
+  }
+  return h;
+}
+function addPhoto(key){
+  const photos=roomData[currentRoom].photos[key]||[];if(photos.length>=4){toast('รูปครบ 4 รูปแล้ว');return;}
+  const input=document.createElement('input');input.type='file';input.accept='image/*';input.capture='environment';
+  input.onchange=e=>{
+    const file=e.target.files[0];if(!file) return;const reader=new FileReader();
+    reader.onload=ev=>{
+      if(!roomData[currentRoom].photos[key]) roomData[currentRoom].photos[key]=[];
+      roomData[currentRoom].photos[key].push(ev.target.result);
+      const sk=key.replace(/[^a-z0-9]/gi,'_');const g=document.getElementById('pg-'+sk);if(g) g.innerHTML=renderPhotoSlots(key,roomData[currentRoom].photos[key]);
+      toast('เพิ่มรูปแล้ว ('+roomData[currentRoom].photos[key].length+'/4)');
+    };reader.readAsDataURL(file);
+  };input.click();
+}
+function delPhoto(key,idx,e){e.stopPropagation();roomData[currentRoom].photos[key].splice(idx,1);const sk=key.replace(/[^a-z0-9]/gi,'_');const g=document.getElementById('pg-'+sk);if(g) g.innerHTML=renderPhotoSlots(key,roomData[currentRoom].photos[key])}
+function setCheck(key,val,btn){
+  const d=roomData[currentRoom];d.checks[key]=val;
+  btn.closest('.cl-item').querySelectorAll('.cbtn').forEach(b=>b.classList.remove('ok','fail'));btn.classList.add(val);
+  const issueEl=btn.closest('.cl-item').parentElement.querySelector(`[data-issue-for="${key}"]`);
+  if(val==='fail'&&!issueEl){if(!d.photos[key]) d.photos[key]=[];btn.closest('.cl-item').after(makeIssueArea(key,'',d.photos[key]));}
+  else if(val==='ok'&&issueEl){issueEl.remove();delete d.notes[key];delete d.photos[key];delete d.repairStatus[key];}
+}
+function setNote(key,val){roomData[currentRoom].notes[key]=val}
+function saveRoom(){
+  const d=roomData[currentRoom];
+  d.status=Object.values(d.checks).some(v=>v==='fail')?'issue':Object.keys(d.checks).length>0?'done':'pending';
+  goBack();updateStats();renderOverview();renderRoomList();toast('✓ บันทึกห้อง '+currentRoom+' แล้ว');
+}
+function goBack(){
+  document.getElementById('page-home').classList.add('active');document.getElementById('page-room').classList.remove('active');
+  document.getElementById('topbar-title').textContent='🏨 HK Room Checklist';document.getElementById('back-btn').style.display='none';currentRoom=null;
+}
+
+let dragState=null;
+function renderEditChecklist(){
+  const body=document.getElementById('edit-body');body.innerHTML='';
+  CHECKLIST.forEach((section,si)=>{
+    const wrap=document.createElement('div');wrap.className='edit-sec-wrap';wrap.dataset.si=si;
+    const hd=document.createElement('div');hd.className='edit-sec-hd';
+    const sdrag=document.createElement('span');sdrag.className='esec-drag';sdrag.innerHTML='<i class="ti ti-grid-dots"></i>';
+    const sinp=document.createElement('input');sinp.className='esec-input';sinp.value=section.sec;sinp.onchange=()=>{CHECKLIST[si].sec=sinp.value;toast('บันทึกแล้ว')};
+    const sdel=document.createElement('button');sdel.className='icon-btn danger';sdel.innerHTML='<i class="ti ti-trash"></i>';sdel.onclick=()=>deleteSection(si);
+    hd.appendChild(sdrag);hd.appendChild(sinp);hd.appendChild(sdel);wrap.appendChild(hd);
+    initSecDrag(sdrag,wrap,si);
+    section.items.forEach((item,ii)=>{
+      const row=document.createElement('div');row.className='edit-item-row';row.dataset.si=si;row.dataset.ii=ii;
+      const idrg=document.createElement('span');idrg.className='eitem-drag';idrg.innerHTML='<i class="ti ti-grip-vertical"></i>';
+      const inp=document.createElement('input');inp.value=item;inp.onchange=()=>{CHECKLIST[si].items[ii]=inp.value;toast('บันทึกแล้ว')};
+      const del=document.createElement('button');del.className='icon-btn danger';del.innerHTML='<i class="ti ti-x"></i>';del.onclick=()=>deleteItem(si,ii);
+      row.appendChild(idrg);row.appendChild(inp);row.appendChild(del);wrap.appendChild(row);initItemDrag(idrg,row,si,ii);
+    });
+    const addRow=document.createElement('div');addRow.className='add-item-row';
+    const ainp=document.createElement('input');ainp.className='add-item-input';ainp.id='ni-'+si;ainp.placeholder='เพิ่มรายการใหม่...';ainp.onkeydown=e=>{if(e.key==='Enter') addItem(si)};
+    const abtn=document.createElement('button');abtn.className='add-item-btn';abtn.textContent='+ เพิ่ม';abtn.onclick=()=>addItem(si);
+    addRow.appendChild(ainp);addRow.appendChild(abtn);wrap.appendChild(addRow);body.appendChild(wrap);
+  });
+}
+function initItemDrag(handle,row,si,ii){
+  const start=e=>{e.stopPropagation();dragState={type:'item',si,ii,row};row.classList.add('dragging');document.addEventListener('mousemove',move);document.addEventListener('touchmove',move,{passive:false});document.addEventListener('mouseup',end);document.addEventListener('touchend',end)};
+  const move=e=>{if(!dragState||dragState.type!=='item') return;if(e.cancelable) e.preventDefault();const touch=e.touches?e.touches[0]:e;const el=document.elementFromPoint(touch.clientX,touch.clientY);document.querySelectorAll('.edit-item-row').forEach(r=>r.classList.remove('drag-over'));const target=el&&el.closest('.edit-item-row');if(target&&target!==dragState.row) target.classList.add('drag-over')};
+  const end=e=>{if(!dragState||dragState.type!=='item'){cleanup();return;}const touch=e.changedTouches?e.changedTouches[0]:e;const el=document.elementFromPoint(touch.clientX,touch.clientY);const target=el&&el.closest('.edit-item-row');document.querySelectorAll('.edit-item-row').forEach(r=>r.classList.remove('drag-over'));if(target&&target!==dragState.row){const tsi=+target.dataset.si,tii=+target.dataset.ii;const item=CHECKLIST[dragState.si].items.splice(dragState.ii,1)[0];CHECKLIST[tsi].items.splice(tii,0,item);renderEditChecklist();toast('ย้ายแล้ว')}cleanup()};
+  const cleanup=()=>{if(dragState&&dragState.row) dragState.row.classList.remove('dragging');dragState=null;document.removeEventListener('mousemove',move);document.removeEventListener('touchmove',move);document.removeEventListener('mouseup',end);document.removeEventListener('touchend',end)};
+  handle.addEventListener('mousedown',start);handle.addEventListener('touchstart',start,{passive:true});
+}
+function initSecDrag(handle,secEl,si){
+  const start=e=>{e.stopPropagation();dragState={type:'sec',si,secEl};secEl.classList.add('sec-dragging');document.addEventListener('mousemove',move);document.addEventListener('touchmove',move,{passive:false});document.addEventListener('mouseup',end);document.addEventListener('touchend',end)};
+  const move=e=>{if(!dragState||dragState.type!=='sec') return;if(e.cancelable) e.preventDefault();const touch=e.touches?e.touches[0]:e;const el=document.elementFromPoint(touch.clientX,touch.clientY);document.querySelectorAll('.edit-sec-wrap').forEach(s=>s.classList.remove('sec-drag-over'));const target=el&&el.closest('.edit-sec-wrap');if(target&&target!==dragState.secEl) target.classList.add('sec-drag-over')};
+  const end=e=>{if(!dragState||dragState.type!=='sec'){cleanup();return;}const touch=e.changedTouches?e.changedTouches[0]:e;const el=document.elementFromPoint(touch.clientX,touch.clientY);const target=el&&el.closest('.edit-sec-wrap');document.querySelectorAll('.edit-sec-wrap').forEach(s=>s.classList.remove('sec-drag-over'));if(target&&target!==dragState.secEl){const tsi=+target.dataset.si;const sec=CHECKLIST.splice(dragState.si,1)[0];CHECKLIST.splice(tsi,0,sec);renderEditChecklist();toast('ย้ายหมวดแล้ว')}cleanup()};
+  const cleanup=()=>{if(dragState&&dragState.secEl) dragState.secEl.classList.remove('sec-dragging');dragState=null;document.removeEventListener('mousemove',move);document.removeEventListener('touchmove',move);document.removeEventListener('mouseup',end);document.removeEventListener('touchend',end)};
+  handle.addEventListener('mousedown',start);handle.addEventListener('touchstart',start,{passive:true});
+}
+function deleteItem(si,ii){if(!confirm('ลบ "'+CHECKLIST[si].items[ii]+'" ?')) return;CHECKLIST[si].items.splice(ii,1);renderEditChecklist();toast('ลบแล้ว')}
+function deleteSection(si){if(!confirm('ลบหมวด "'+CHECKLIST[si].sec+'" ทั้งหมด?')) return;CHECKLIST.splice(si,1);renderEditChecklist();toast('ลบหมวดแล้ว')}
+function addItem(si){const inp=document.getElementById('ni-'+si);const val=inp.value.trim();if(!val) return;CHECKLIST[si].items.push(val);inp.value='';renderEditChecklist();setTimeout(()=>{const el=document.getElementById('ni-'+si);if(el) el.focus()},50);toast('เพิ่มแล้ว')}
+function addSection(){CHECKLIST.push({sec:'หมวดใหม่',items:[]});renderEditChecklist();setTimeout(()=>{const els=document.querySelectorAll('.esec-input');if(els.length) els[els.length-1].select()},80)}
+
+function exportSummary(){
+  let t='📋 สรุปสถานะห้องพัก\n================================\n';
+  let done=0,issue=0,pend=0;ALL_ROOMS.forEach(r=>{const s=roomData[r.id].status;if(s==='done')done++;else if(s==='issue')issue++;else pend++;});
+  t+=`รวม ${ALL_ROOMS.length} ห้อง | ✓ เสร็จ: ${done} | ✗ มีปัญหา: ${issue} | รอ: ${pend}\n\n`;
+  ROOM_DATA.forEach(group=>{
+    const issues=group.rooms.filter(rn=>roomData[rn].status!=='pending');if(!issues.length) return;
+    t+=`[${group.type}]\n`;
+    issues.forEach(rn=>{const d=roomData[rn];t+=`  ห้อง ${rn} [${d.status==='done'?'✓':'✗'}]\n`;Object.entries(d.notes).forEach(([k,v])=>{if(v) t+=`    - ${k.split('__')[1]}: ${v}\n`;});});
+  });
+  try{navigator.clipboard.writeText(t);toast('คัดลอกแล้ว!')}catch(e){alert(t)}
+}
+function exportRepair(){
+  let t='🔧 รายการแจ้งช่าง\n================================\n';
+  JOB_TYPES.forEach(jt=>{
+    let s='';ALL_ROOMS.forEach(r=>{const d=roomData[r.id];const it=Object.entries(d.checks).filter(([k,v])=>v==='fail'&&matchJob(k,jt.id));if(!it.length) return;s+=`  ห้อง ${r.id}: `+it.map(([k])=>k.split('__')[1]).join(', ')+'\n';it.forEach(([k])=>{if(d.notes[k]) s+=`    ↳ ${d.notes[k]}\n`;});});
+    if(s) t+=`\n[${jt.name}]\n${s}`;
+  });
+  try{navigator.clipboard.writeText(t);toast('คัดลอกแล้ว!')}catch(e){alert(t)}
+}
+
+function switchTab(tab,btn){
+  document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));btn.classList.add('active');
+  ['overview','rooms','tech','edit','export'].forEach(t=>{const el=document.getElementById('tab-'+t);if(el) el.style.display=t===tab?'block':'none';});
+  if(tab==='rooms') renderRoomList();if(tab==='tech') showTechSelect();if(tab==='edit') renderEditChecklist();
+}
+function filterRooms(val){currentSearch=val;renderRoomList()}
+function setFilter(f,btn){currentFilter=f;document.querySelectorAll('.fchip').forEach(b=>b.classList.remove('active'));btn.classList.add('active');renderRoomList()}
+function updateStats(){
+  let done=0,issue=0,pend=0;ALL_ROOMS.forEach(r=>{const s=roomData[r.id].status;if(s==='done')done++;else if(s==='issue')issue++;else pend++;});
+  document.getElementById('s-done').textContent=done;document.getElementById('s-issue').textContent=issue;document.getElementById('s-pend').textContent=pend;
+  const pct=Math.round((done+issue)/ALL_ROOMS.length*100);document.getElementById('prog-pct').textContent=pct+'%';document.getElementById('prog-bar').style.width=pct+'%';
+}
+function openLightbox(src){document.getElementById('lb-img').src=src;document.getElementById('lightbox').classList.add('show')}
+function closeLightbox(){document.getElementById('lightbox').classList.remove('show')}
+renderOverview();updateStats();
+</script>
+</body>
+</html>
