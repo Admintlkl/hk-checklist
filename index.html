@@ -195,6 +195,11 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
       <button class="add-sec-btn" onclick="addSection()"><i class="ti ti-plus"></i> เพิ่มหมวดหมู่ใหม่</button>
     </div>
     <div id="tab-export" style="display:none">
+      <div class="exp-card" style="border-color:#F5C4B3">
+        <div class="exp-title">🔄 รีเซ็ตข้อมูลทั้งหมด</div>
+        <div class="exp-sub">ล้างข้อมูลการตรวจทั้งหมด เริ่มใหม่</div>
+        <button class="exp-btn" style="color:#A32D2D;border-color:#F5C4B3" onclick="resetAll()"><i class="ti ti-trash"></i> ล้างข้อมูล</button>
+      </div>
       <div class="exp-card"><div class="exp-title">สรุปภาพรวม</div><div class="exp-sub">สถานะห้องทั้งหมดพร้อมรายการปัญหา</div><button class="exp-btn" onclick="exportSummary()"><i class="ti ti-copy"></i> คัดลอก</button></div>
       <div class="exp-card"><div class="exp-title">รายการแจ้งช่าง</div><div class="exp-sub">จัดกลุ่มตามประเภทงาน</div><button class="exp-btn" onclick="exportRepair()"><i class="ti ti-copy"></i> คัดลอก</button></div>
     </div>
@@ -230,7 +235,10 @@ let CHECKLIST=[
   {sec:'3. โต๊ะเครื่องแป้ง',items:['ผนังกั้น - ยาแนว','ผนังกั้น - แผงลายจำปูนบิ่น/สีลอก','ผนังกั้น - กระจกมีรอยขีด','พื้นปาเก้ - ยุบ/บวม','พื้นปาเก้ - ยาแนวไม่เต็ม','คิ้วบัวรอบห้อง - ยาแนว','ปลั๊กไฟ - ติดสลับไม่ตรงรูป','ปลั๊กไฟ - หลุด','บลูทูธ - ยาแนว','โคมไฟ - สีลอก','โคมไฟ - ขาหลวม','ผนังข้างโต๊ะมินิบาร์ - แตกร้าว']},
   {sec:'4. โซฟา',items:['โซฟาและพนักพิง - สีลอก','โซฟาและพนักพิง - น็อตหลุด','โต๊ะหน้าโซฟา - สีลอก','ผนังข้างโซฟา - แตกร้าว','TV - เสาทีวีติดสี','TV - มีรูเพดานตรงเสาทีวี','พัดลมเพดาน - ฝาครอบหลุด/หลวม']},
   {sec:'5. ห้องนอน',items:['เตียงนอน - สีลอก','เตียงนอน - ล้อเตียง','เตียงนอน - ไม้รองขาเตียง','โต๊ะหัวเตียง - สีลอก','โต๊ะหัวเตียง - ยาแนว','โคมไฟหัวเตียง - สีลอก','โคมไฟหัวเตียง - จุกโคมหลุด/หาย','ระบบไฟ - ไฟส่องหนังสือ','ระบบไฟ - เมนท์สวิตซ์','ระบบไฟ - ปลั๊ก USB','ขอบกระจกหัวเตียง - สีลอก','แผงลายฉลุดอกจำปูนหัวเตียง - สีลอก','ฝ้าเพดาน - สีลอก','ผนังห้อง - สีลอก/บิ่น','ผนังหน้ากากแอร์ - บวม/แตกร้าว','ระบบแอร์ - ไม่ได้หุ้มฟอยท์','ระบบแอร์ - ปุ่มกด','ตัวดักควัน - ไฟกระพริบเตือน','ตัวดักควัน - ฝาครอบ']},
-  {sec:'6. หลังระเบียง',items:['ฝ้าเพดาน - คิ้วไม้หลุด/บวม','ฝ้าเพดาน - น้ำรั่ว/ซึม','ฝ้าเพดาน - ฝ้าเชิงชายหลุด','ระบบไฟระเบียง','เสาซังเก้น - สีลอก','เสาซังเก้น - ฐานปูนแตกร้าว','เหล็ก/ไม้ตรงเสาซังเก้น - สีลอก','ผนังไม้ระแนง - เด้ง/บวม','ผนังหลังระเบียง - แตกร้าว','กระจกกั้นซังเก้น - สนิมตัวล็อค']},
+  {sec:'6. หลังระเบียง',items:['ฝ้าเพดาน - คิ้วไม้หลุด/บวม','ฝ้าเพดาน - น้ำรั่ว/ซึม','ฝ้าเพดาน - ฝ้าเชิงชายหลุด','ระบบไฟระเบียง','เสาซังเก้น - สีลอก','เสาซังเก้น - ฐานปูนแตกร้าว','เหล็ก/ไม้ตรงเสาซังเก้น - สีลอก','ผนังไม้ระแนง - เด้ง/บวม','ผนังหลังระเบียง - แตกร้าว','กระจกกั้นซังเก้น - สนิมตัวล็อค','บันไดลงสระน้ำ - ตัวสกริมเมอร์ขึ้นสนิม','พื้นบริเวณสระน้ำ - คราบกาวขัดไม่ออก','พื้นบริเวณสระน้ำ - ยาแนว','ท่อน้ำทิ้งหลังระเบียง - สนิม','รางผ้าม่าน - สีแตกร่อน','ประตูซีวิว - มือจับประตูหลวม','ประตูซีวิว - กลอนล็อคกันตกของเด็ก','ประตูซีวิว - ฝืด','ขอบเฟรมประตูซีวิว - เป็นรู']},
+  {sec:'7. ห้องน้ำ',items:['อ่างอาบน้ำ - รอยขูด/ขีด','อ่างอาบน้ำ - โคมไฟดอกจำปูนสีด่าง','ประตูบานเลื่อนห้องน้ำ - ฟิล์มกระจกหลุด','ประตูบานเลื่อนห้องน้ำ - ฟิล์มกระจกเป็นคราบ','ม่านมู่ลี่ - เสียงดังผิดปกติ','ชั้นวางของบริเวณก๊อกน้ำ - ยาแนว','Stopper - ไม่ดีดขึ้น','Stopper - รอยขูดขีด','ท่อเดรนใต้อ่าง - ไม่มีตัวกรองดักกลิ่น','ท่อเดรนใต้อ่าง - สายท่อยาว/พับ','พื้นในห้องน้ำ - ไม่สโลบ','พื้นในห้องน้ำ - ยาแนว','พื้นในห้องน้ำ - ซิลิโคนขอบกระจก','อ่างล้างหน้า - หัวก๊อกหลวม','อ่างล้างหน้า - ยาแนว','ระบบไฟห้องน้ำ','เต้าเสียบที่โกนหนวด','โคมไฟห้อย','ท่อใต้อ่างล้างหน้า - ท่อรั่ว','เคาน์เตอร์อ่าง - กระเบื้องหินร้าว','เคาน์เตอร์อ่าง - ยาแนว','ผนังตู้วางของ - บิ่น','ผนังตู้วางของ - ยาแนว','กระจก - รอยขูดขีด','กระจก - เป็นปรอท','ชั้นวางผ้าใต้อ่าง','กระจกขยาย - ขาหลวม','กระจกขยาย - ไฟ','ตะขอแขวนผ้า - หลุด/หลวม']},
+  {sec:'8. ห้อง Shower',items:['ประตูห้อง Shower - ยางกันกระแทกด้านข้าง','ประตูห้อง Shower - ยางกันน้ำซึมด้านล่าง','ประตูห้อง Shower - ฟิล์มกระจกขาด/เป็นคราบ','มือจับประตู - หลุด/หลวม','มือจับประตู - ปุ่มยางกันกระแทก','กันชนประตู - หลุด/ไม่มี','ชั้นวางสบู่ - ยาแนว','ท่อเดรนห้อง Shower - เจาะรูฝาดักกลิ่น','ท่อเดรนห้อง Shower - ไม่มีฝาดักกลิ่น','ระบบไฟ - สวิตซ์ติดสลับ','หัวก๊อก - หลวม','ฝักบัวอาบน้ำ - สายฝักบัวแตก','ฝักบัวอาบน้ำ - ที่แขวนหลวม','Rain Shower - น้ำออกไม่ครบรู/ขี้เกลือ','พัดลมดูดอากาศ - เสียงดัง']},
+  {sec:'9. ห้องชักโครก',items:['ประตูห้องชักโครก - ยางกันกระแทกด้านข้าง','ประตูห้องชักโครก - ฟิล์มกระจกขาด/เป็นคราบ','มือจับประตู - หลุด/หลวม','มือจับประตู - ปุ่มยางกันกระแทก','กันชนประตู - หลุด/ไม่มี','ที่แขวนกระดาษชำระ - หลุด/หลวม','ที่แขวนกระดาษชำระ - ยาแนว','พัดลมดูดอากาศ - เสียงดัง','โถชักโครก - ฝาหลวม','โถชักโครก - ฝาตีหลัง','โถชักโครก - มีรอยด่าง','ท่อเดรนห้องชักโครก']},
 ];
 
 const JOB_TYPES=[
@@ -243,9 +251,38 @@ const JOB_TYPES=[
   {id:'other',name:'งานอื่นๆ',icon:'ti-settings',kw:[]},
 ];
 
-let roomData={};
 let currentRoom=null,currentFilter='all',currentSearch='';
+
+function saveToStorage(){
+  try{
+    // photos too heavy for localStorage, save separately without photos
+    const light={};
+    Object.keys(roomData).forEach(id=>{
+      light[id]={status:roomData[id].status,checks:roomData[id].checks,notes:roomData[id].notes,repairStatus:roomData[id].repairStatus};
+    });
+    localStorage.setItem('hk_data',JSON.stringify(light));
+  }catch(e){console.warn('save failed',e)}
+}
+
+function loadFromStorage(){
+  try{
+    const raw=localStorage.getItem('hk_data');
+    if(!raw) return;
+    const saved=JSON.parse(raw);
+    Object.keys(saved).forEach(id=>{
+      if(roomData[id]){
+        roomData[id].status=saved[id].status||'pending';
+        roomData[id].checks=saved[id].checks||{};
+        roomData[id].notes=saved[id].notes||{};
+        roomData[id].repairStatus=saved[id].repairStatus||{};
+      }
+    });
+  }catch(e){console.warn('load failed',e)}
+}
+
+let roomData={};
 ALL_ROOMS.forEach(r=>{roomData[r.id]={status:'pending',checks:{},notes:{},photos:{},repairStatus:{}}});
+loadFromStorage();
 
 function toast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2000)}
 
@@ -320,6 +357,8 @@ function showTechResult(jt){
     }).join('');
     const ri=ALL_ROOMS.find(x=>x.id===r.id);
     card.innerHTML=`<div class="tech-hd"><span style="font-size:14px;font-weight:500">ห้อง ${r.id}</span><span style="font-size:11px;color:var(--text2)">${ri?ri.type:''}</span><span class="badge bi">${keys.length} จุด</span></div>${html}`;
+    // color done items green
+    card.querySelectorAll('.tsbtn.done').forEach(b=>{b.closest('.tech-job-item').style.background='#f0faf5'});
     container.appendChild(card);
   });
   if(!found) container.innerHTML='<div style="text-align:center;padding:32px 0;color:var(--text2);font-size:13px">ไม่พบห้องที่ต้องดำเนินการ</div>';
@@ -327,7 +366,10 @@ function showTechResult(jt){
 function setRS(roomId,key,status,btn){
   roomData[roomId].repairStatus[key]=status;
   btn.closest('.tech-status-row').querySelectorAll('.tsbtn').forEach(b=>b.classList.remove('wait','done'));
-  btn.classList.add(status);toast(status==='done'?'✓ แก้ไขแล้ว':'⏳ รอช่าง');
+  btn.classList.add(status);
+  const item=btn.closest('.tech-job-item');
+  if(item) item.style.background=status==='done'?'#f0faf5':'';
+  saveToStorage();toast(status==='done'?'✓ แก้ไขแล้ว':'⏳ รอช่าง');
 }
 
 function openRoom(id){
@@ -394,7 +436,7 @@ function setNote(key,val){roomData[currentRoom].notes[key]=val}
 function saveRoom(){
   const d=roomData[currentRoom];
   d.status=Object.values(d.checks).some(v=>v==='fail')?'issue':Object.keys(d.checks).length>0?'done':'pending';
-  goBack();updateStats();renderOverview();renderRoomList();toast('✓ บันทึกห้อง '+currentRoom+' แล้ว');
+  saveToStorage();goBack();updateStats();renderOverview();renderRoomList();toast('✓ บันทึกห้อง '+currentRoom+' แล้ว');
 }
 function goBack(){
   document.getElementById('page-home').classList.add('active');document.getElementById('page-room').classList.remove('active');
@@ -464,6 +506,13 @@ function exportRepair(){
   try{navigator.clipboard.writeText(t);toast('คัดลอกแล้ว!')}catch(e){alert(t)}
 }
 
+function resetAll(){
+  if(!confirm('ล้างข้อมูลการตรวจทั้งหมด?\nไม่สามารถกู้คืนได้')) return;
+  ALL_ROOMS.forEach(r=>{roomData[r.id]={status:'pending',checks:{},notes:{},photos:{},repairStatus:{}}});
+  localStorage.removeItem('hk_data');
+  updateStats();renderOverview();renderRoomList();
+  toast('ล้างข้อมูลแล้ว');
+}
 function switchTab(tab,btn){
   document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));btn.classList.add('active');
   ['overview','rooms','tech','edit','export'].forEach(t=>{const el=document.getElementById('tab-'+t);if(el) el.style.display=t===tab?'block':'none';});
